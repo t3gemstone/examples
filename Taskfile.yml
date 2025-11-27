@@ -33,6 +33,8 @@ env:
   MCUSW_PATH: "{{ .TI_INSTALL_DIR }}/MCUSW_J722S_10.01.00.03"
   SYSCFG_PATH: "{{ .TI_INSTALL_DIR }}/sysconfig_1.20.0"
   TOOLS_PATH: "{{ .TI_INSTALL_DIR }}"
+  COLOR_ERR: \033[0;31m
+  COLOR_RESET: \033[0m
 
 tasks:
 
@@ -150,6 +152,12 @@ tasks:
           tar xf "{{ .DOWNLOAD_DIR }}/gcc_arm.tar.xz" --directory "{{ .TI_INSTALL_DIR }}"
         fi
       - make -j$(nproc) -C mcu libs >/dev/null
+    preconditions:
+      - sh: ldconfig -p | grep -i libtinfo.so.5
+        msg: |
+          libtinfo5 library is needed, install it from your package manager. For Ubuntu:
+            wget http://security.ubuntu.com/ubuntu/pool/universe/n/ncurses/libtinfo5_6.3-2ubuntu0.1_amd64.deb
+            sudo apt install ./libtinfo5_6.3-2ubuntu0.1_amd64.deb
 
   sysconfig:
     cmds:

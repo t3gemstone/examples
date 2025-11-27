@@ -16,8 +16,8 @@ sysconfig: check-tools
 
 check-tools:
 	@$(foreach tool,$(TI_REQUIRED_TOOLS), \
-		if [ ! -d "$($(tool))" ] || [ -z "$(shell ls -A "$($(tool))")" ]; then \
-			echo "ERROR: $($(tool)) directory does not exist or it is empty"; \
+		if [ ! -d "$($(tool))" ] || [ -z "$$(ls -A "$($(tool))")" ]; then \
+			echo "$(COLOR_ERR)TI SDK is not available, please run 'task fetch-ti' to install$(COLOR_RESET)"; \
 			exit 1; \
 		fi;)
 
