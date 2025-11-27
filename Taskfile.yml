@@ -10,6 +10,8 @@ vars:
   DOWNLOAD_DIR: "{{ .BUILD_DIR }}/downloads"
   TOOLCHAINS_DIR: "{{ .BUILD_DIR }}/${DISTRO_BASE}-${DISTRO_SUITE}"
   TI_INSTALL_DIR: "{{ .BUILD_DIR }}/ti"
+  MAKE_CMD:
+    sh: echo make -j $(nproc)
   URLS:
     map: {
       toolchains: "https://github.com/t3gemstone/toolchains/releases/latest/download/t3gemstone-toolchains-${DISTRO_BASE}-${DISTRO_SUITE}.tar.gz",
@@ -44,12 +46,12 @@ tasks:
       - task --list-all --summary
       - echo
       - echo "Environment:"
-      - echo "  MACHINE        = ${MACHINE}"
-      - echo "  DISTRO_BASE    = ${DISTRO_BASE}"
-      - echo "  DISTRO_SUITE   = ${DISTRO_SUITE}"
-      - echo "  DISTRO_TYPE    = ${DISTRO_TYPE}"
-      - echo "  PROJECT        = ${PROJECT}"
-      - echo "  CROSS_COMPILE  = ${CROSS_COMPILE}"
+      - echo "  MACHINE       = ${MACHINE}"
+      - echo "  DISTRO_BASE   = ${DISTRO_BASE}"
+      - echo "  DISTRO_SUITE  = ${DISTRO_SUITE}"
+      - echo "  DISTRO_TYPE   = ${DISTRO_TYPE}"
+      - echo "  PROJECT       = ${PROJECT}"
+      - echo "  CROSS_COMPILE = ${CROSS_COMPILE}"
       - echo
       - echo "TI Environment:"
       - echo "  PROFILE          = ${PROFILE}"
@@ -151,7 +153,8 @@ tasks:
         if [ ! -d "${GCC_ARM_PATH}" ]; then
           tar xf "{{ .DOWNLOAD_DIR }}/gcc_arm.tar.xz" --directory "{{ .TI_INSTALL_DIR }}"
         fi
-      - make -j$(nproc) -C mcu libs >/dev/null
+      - |
+        {{ .MAKE_CMD }} -C mcu libs >/dev/null
     preconditions:
       - sh: ldconfig -p | grep -i libtinfo.so.5
         msg: |
@@ -163,7 +166,7 @@ tasks:
     cmds:
       - task: fetch-ti
       - |
-        make -C mcu sysconfig
+        {{ .MAKE_CMD }} -C mcu sysconfig
 
   build:
     cmds:
@@ -172,7 +175,7 @@ tasks:
         if [ "${CROSS_COMPILE}" == "true" ]; then
           pushd "{{ .TOOLCHAINS_DIR }}" >/dev/null && source ./env && popd >/dev/null
         fi
-        make -C "${PROJECT}"
+        {{ .MAKE_CMD }} -C "${PROJECT}"
 
   clean:
     cmds:
@@ -181,7 +184,7 @@ tasks:
         if [ "${CROSS_COMPILE}" == "true" ]; then
           pushd "{{ .TOOLCHAINS_DIR }}" >/dev/null && source ./env && popd >/dev/null
         fi
-        make -C "${PROJECT}" clean
+        {{ .MAKE_CMD }} -C "${PROJECT}" clean
 
   create-virtual-camera:
     silent: true
