@@ -1,0 +1,12 @@
+{
+  "exposure": 13810,
+  "gain": 100,
+  "focus": 121,
+  "red_gain": 1.0,
+  "green_gain": 0.98,
+  "blue_gain": 0.98,
+  "gamma": 1.5,
+  "contrast": 1.06,
+  "saturation": 1.25,
+  "ae_mode": "auto"
+}
